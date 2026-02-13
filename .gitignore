@@ -1,0 +1,8 @@
+out/
+dist/
+node_modules/
+sample-logs/
+/*.vsix
+.vscode-test/
+log/
+docker/workspace/

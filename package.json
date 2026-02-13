@@ -1,0 +1,552 @@
+{
+  "name": "log-viewer",
+  "displayName": "Log Viewer",
+  "description": "A VS Code extension for viewing and filtering logs",
+  "version": "0.0.1",
+  "publisher": "Nicolas Ramirez",
+  "author": "ramirezcgn",
+  "keywords": [
+    "log",
+    "viewer",
+    "filter",
+    "vscode"
+  ],
+  "bugs": {
+    "url": "https://github.com/ramirezcgn/log-viewer/issues"
+  },
+  "homepage": "https://github.com/ramirezcgn/log-viewer#readme",
+  "icon": "images/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ramirezcgn/log-viewer.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "views": {
+      "log-viewer": [
+        {
+          "id": "logExplorer",
+          "name": "Watches",
+          "icon": "images/icon.svg"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "logviewer.selectFiles",
+          "when": "view == logExplorer",
+          "group": "navigation"
+        },
+        {
+          "command": "logviewer.unwatchAll",
+          "when": "view == logExplorer",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "logviewer.unwatchLogResource",
+          "when": "viewItem == watchItem-watching",
+          "group": "inline"
+        },
+        {
+          "command": "logviewer.removeWatch",
+          "when": "viewItem == watchItem || viewItem == watchItem-watching",
+          "group": "inline"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "logviewer.setFilterLevel",
+          "when": "resourceScheme == 'log-viewer' && !logviewer.levelActive",
+          "group": "navigation@1"
+        },
+        {
+          "command": "logviewer.setFilterLevelActive",
+          "when": "resourceScheme == 'log-viewer' && logviewer.levelActive",
+          "group": "navigation@1"
+        },
+        {
+          "command": "logviewer.setSearchPattern",
+          "when": "resourceScheme == 'log-viewer' && !logviewer.searchActive",
+          "group": "navigation@2"
+        },
+        {
+          "command": "logviewer.clearSearchPattern",
+          "when": "resourceScheme == 'log-viewer' && logviewer.searchActive",
+          "group": "navigation@2"
+        },
+        {
+          "command": "logviewer.enableCleanFormat",
+          "when": "resourceScheme == 'log-viewer' && !logviewer.cleanFormatActive",
+          "group": "navigation@3"
+        },
+        {
+          "command": "logviewer.disableCleanFormat",
+          "when": "resourceScheme == 'log-viewer' && logviewer.cleanFormatActive",
+          "group": "navigation@3"
+        },
+        {
+          "command": "logviewer.configureFilters",
+          "when": "resourceScheme == 'log-viewer'",
+          "group": "navigation@4"
+        },
+        {
+          "command": "logviewer.exportFiltered",
+          "when": "resourceScheme == 'log-viewer'",
+          "group": "navigation@5"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "log-viewer",
+          "title": "Log Viewer",
+          "icon": "images/icon.svg"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "logviewer.toggleFollowTail",
+        "title": "Log Viewer: Toggle follow tail"
+      },
+      {
+        "command": "logviewer.clearLogView",
+        "title": "Log Viewer: Clear log view"
+      },
+      {
+        "command": "logviewer.resetLogView",
+        "title": "Log Viewer: Reset log view"
+      },
+      {
+        "command": "logviewer.unwatchAll",
+        "title": "Log Viewer: Unwatch all"
+      },
+      {
+        "command": "logviewer.unwatchLogResource",
+        "title": "Log Viewer: Stop watching",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "logviewer.removeWatch",
+        "title": "Log Viewer: Remove from list",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "logviewer.openCurrentFile",
+        "title": "Log Viewer: Open current log file"
+      },
+      {
+        "command": "logviewer.openLastChanged",
+        "title": "Log Viewer: Open the last changed watch"
+      },
+      {
+        "command": "logviewer.showExtensionLogs",
+        "title": "Log Viewer: Show extension logs"
+      },
+      {
+        "command": "logviewer.toggleFilter",
+        "title": "Log Viewer: Toggle log filtering"
+      },
+      {
+        "command": "logviewer.enableFilter",
+        "title": "Log Viewer: Enable filtering",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "logviewer.disableFilter",
+        "title": "Log Viewer: Disable filtering",
+        "icon": "$(filter-filled)"
+      },
+      {
+        "command": "logviewer.setFilterLevel",
+        "title": "Log Viewer: Set filter level",
+        "icon": "$(list-unordered)"
+      },
+      {
+        "command": "logviewer.setFilterLevelActive",
+        "title": "Log Viewer: Set filter level",
+        "icon": "$(filter-filled)"
+      },
+      {
+        "command": "logviewer.setSearchPattern",
+        "title": "Log Viewer: Set search pattern",
+        "icon": "$(search)"
+      },
+      {
+        "command": "logviewer.clearSearchPattern",
+        "title": "Log Viewer: Clear search pattern",
+        "icon": "$(search-stop)"
+      },
+      {
+        "command": "logviewer.toggleCleanFormat",
+        "title": "Log Viewer: Toggle clean format"
+      },
+      {
+        "command": "logviewer.enableCleanFormat",
+        "title": "Log Viewer: Enable clean format",
+        "icon": "$(list-tree)"
+      },
+      {
+        "command": "logviewer.disableCleanFormat",
+        "title": "Log Viewer: Disable clean format",
+        "icon": "$(list-flat)"
+      },
+      {
+        "command": "logviewer.configureFilters",
+        "title": "Log Viewer: Configure filters",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "logviewer.exportFiltered",
+        "title": "Log Viewer: Export filtered log",
+        "icon": "$(export)"
+      },
+      {
+        "command": "logviewer.selectFiles",
+        "title": "Log Viewer: Select log files",
+        "icon": "$(add)"
+      }
+    ],
+    "configuration": {
+      "title": "Log Viewer",
+      "type": "object",
+      "properties": {
+        "logViewer.watch": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "description": "Glob pattern.",
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "description": "Text to use in the explorer view and for the tab name.",
+                    "type": "string"
+                  },
+                  "pattern": {
+                    "description": "Glob pattern.",
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    ]
+                  },
+                  "workspaceName": {
+                    "description": "When in a multi-root workspace, which workspace should be used to resolve relative patterns.",
+                    "type": "string"
+                  },
+                  "options": {
+                    "description": "Options for this watch (overrides logViewer.options).",
+                    "type": "object",
+                    "properties": {
+                      "fileCheckInterval": {
+                        "type": "number",
+                        "default": 500,
+                        "description": "Interval in ms to check for changes in current file."
+                      },
+                      "fileListInterval": {
+                        "type": "number",
+                        "default": 2000,
+                        "description": "Interval in ms to search for new files."
+                      },
+                      "ignorePattern": {
+                        "type": "string",
+                        "description": "This pattern is matched against each segment in the path. Each directory and the file.",
+                        "default": "(node_modules|.git)"
+                      },
+                      "encoding": {
+                        "type": "string",
+                        "description": "Encoding to use when reading the files. `null` to get default vscode behavior or one of https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings",
+                        "default": null
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "pattern"
+                ]
+              },
+              {
+                "type": "object",
+                "description": "A group of watches.",
+                "properties": {
+                  "groupName": {
+                    "description": "Name of the group.",
+                    "type": "string"
+                  },
+                  "watches": {
+                    "type": "array",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "description": "Glob pattern.",
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "array",
+                              "minItems": 1,
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "title": {
+                              "description": "Text to use in the explorer view and for the tab name.",
+                              "type": "string"
+                            },
+                            "pattern": {
+                              "description": "Glob pattern.",
+                              "oneOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "array",
+                                  "minItems": 1,
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              ]
+                            },
+                            "workspaceName": {
+                              "description": "When in a multi-root workspace, which workspace should be used to resolve relative patterns.",
+                              "type": "string"
+                            },
+                            "options": {
+                              "description": "Options for this watch (overrides logViewer.options).",
+                              "type": "object",
+                              "properties": {
+                                "fileCheckInterval": {
+                                  "type": "number",
+                                  "default": 500,
+                                  "description": "Interval in ms to check for changes in current file."
+                                },
+                                "fileListInterval": {
+                                  "type": "number",
+                                  "default": 2000,
+                                  "description": "Interval in ms to search for new files."
+                                },
+                                "ignorePattern": {
+                                  "type": "string",
+                                  "description": "This pattern is matched against each segment in the path. Each directory and the file.",
+                                  "default": "(node_modules|.git)"
+                                },
+                                "encoding": {
+                                  "type": "string",
+                                  "description": "Encoding to use when reading the files. `null` to get default vscode behavior or one of https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings",
+                                  "default": null
+                                }
+                              }
+                            }
+                          },
+                          "required": [
+                            "pattern"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "description": "A group of watches.",
+                          "properties": {
+                            "groupName": {
+                              "description": "Name of the group.",
+                              "type": "string"
+                            },
+                            "watches": {
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "groupName",
+                            "watches"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "groupName",
+                  "watches"
+                ]
+              }
+            ]
+          },
+          "default": [],
+          "description": "Glob patterns of files to watch."
+        },
+        "logViewer.options": {
+          "description": "Global watch options.",
+          "type": "object",
+          "properties": {
+            "fileCheckInterval": {
+              "type": "number",
+              "default": 500,
+              "description": "Interval in ms to check for changes in current file."
+            },
+            "fileListInterval": {
+              "type": "number",
+              "default": 2000,
+              "description": "Interval in ms to search for new files."
+            },
+            "ignorePattern": {
+              "type": "string",
+              "description": "This pattern is matched against each segment in the path. Each directory and the file.",
+              "default": "(node_modules|.git)"
+            },
+            "encoding": {
+              "type": "string",
+              "description": "Encoding to use when reading the files. `null` to get default vscode behavior or one of https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings",
+              "default": null
+            }
+          }
+        },
+        "logViewer.windows.allowBackslashAsPathSeparator": {
+          "type": "boolean",
+          "default": true,
+          "description": "Allow to use \"\\\" (as well as \"/\") as a path separator on windows. Won't be able to escape certain pattern characters when enabled."
+        },
+        "logViewer.showStatusBarItemOnChange": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show an item in the status bar when a watched pattern changes, to quickly access it."
+        },
+        "logViewer.chunkSizeKb": {
+          "type": "number",
+          "default": 64,
+          "description": "Chunk size in kilobytes used to calculate the size of the last chunk to load in the viewer. The loaded last chunk will always be less than 2 * chunkSizeKb."
+        },
+        "logViewer.logLevel": {
+          "description": "Logging level.",
+          "enum": [
+            "trace",
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ],
+          "default": "error"
+        },
+        "logViewer.followTailMode": {
+          "description": "Follow tail behavior.\n `auto` to start following tail when the end of the log is scrolled into the viewport, and stop following tail when it's scrolled out of the viewport.\n `manual` to only start and stop following tail explicitly.",
+          "enum": [
+            "auto",
+            "manual"
+          ],
+          "default": "auto"
+        },
+        "logViewer.filter": {
+          "description": "Filter options for log files.",
+          "type": "object",
+          "properties": {
+            "minLevel": {
+              "type": "string",
+              "enum": [
+                "ALL",
+                "ERROR",
+                "WARN",
+                "INFO",
+                "DEBUG",
+                "TRACE"
+              ],
+              "default": "ALL",
+              "description": "Minimum log level to display."
+            },
+            "searchPattern": {
+              "type": "string",
+              "description": "Search pattern to filter logs (text or regex)."
+            },
+            "cleanFormat": {
+              "type": "boolean",
+              "default": false,
+              "description": "Show only the message part of logs (removes timestamp, level, and source)."
+            },
+            "excludePatterns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Patterns to exclude from logs."
+            },
+            "includePatterns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "If set, only show logs matching these patterns."
+            }
+          }
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test",
+    "vsce": "vsce package --allow-star-activation --no-yarn"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.70.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.7.1",
+    "esbuild": "^0.27.2",
+    "eslint": "^9.39.2",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.52.0"
+  }
+}
