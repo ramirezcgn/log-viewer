@@ -1,4 +1,4 @@
-# Log Viewer - VS Code Extension
+# Log Viewer Plus - VS Code Extension
 
 A VS Code extension for monitoring and filtering log files in real-time.
 
@@ -23,7 +23,7 @@ Define files to monitor in `settings.json`:
 
 ```json
 {
-  "logViewer.watch": [
+  "logViewerPlus.watch": [
     // Simple pattern
     "/path/to/logs/**/*.log",
     
@@ -53,7 +53,7 @@ Define files to monitor in `settings.json`:
 
 ```json
 {
-  "logViewer.options": {
+  "logViewerPlus.options": {
     "fileCheckInterval": 500,      // ms to check changes in current file
     "fileListInterval": 2000,      // ms to search for new files
     "ignorePattern": "(node_modules|.git)",  // Patterns to ignore
@@ -85,7 +85,7 @@ Example:
 
 ```json
 {
-  "logViewer.filter": {
+  "logViewerPlus.filter": {
     "enabled": true,
     "minLevel": "WARN",           // ERROR, WARN, INFO, DEBUG, TRACE
     "searchPattern": "Exception", // Text or regex to search
@@ -134,32 +134,32 @@ Access commands with **Ctrl+Shift+P** (Cmd+Shift+P on Mac):
 
 ### Log Management
 
-- `Log Viewer: Clear log view` - Clears the current view (doesn't modify the file)
-- `Log Viewer: Reset log view` - Restores full content
-- `Log Viewer: Open current log file` - Opens the file in editor
-- `Log Viewer: Open the last changed watch` - Opens the last modified watch
-- `Log Viewer: Unwatch all` - Stops all watches
-- `Log Viewer: Stop watching` - Stops the current watch
+- `Log Viewer Plus: Clear log view` - Clears the current view (doesn't modify the file)
+- `Log Viewer Plus: Reset log view` - Restores full content
+- `Log Viewer Plus: Open current log file` - Opens the file in editor
+- `Log Viewer Plus: Open the last changed watch` - Opens the last modified watch
+- `Log Viewer Plus: Unwatch all` - Stops all watches
+- `Log Viewer Plus: Stop watching` - Stops the current watch
 
 ### View Control
 
-- `Log Viewer: Toggle follow tail` - Enables/disables auto-scroll
-- `Log Viewer: Show extension logs` - Shows extension logs
+- `Log Viewer Plus: Toggle follow tail` - Enables/disables auto-scroll
+- `Log Viewer Plus: Show extension logs` - Shows extension logs
 
 ### Filters
 
-- `Log Viewer: Configure filters` - **Main filter menu** 🎯
-- `Log Viewer: Toggle log filtering` - Enables/disables filters
-- `Log Viewer: Set filter level` - Selects minimum level (ERROR, WARN, INFO, etc.)
-- `Log Viewer: Set search pattern` - Defines search pattern
-- `Log Viewer: Clear search pattern` - Clears search pattern
-- `Log Viewer: Toggle clean format` - Toggles between full and clean format
+- `Log Viewer Plus: Configure filters` - **Main filter menu** 🎯
+- `Log Viewer Plus: Toggle log filtering` - Enables/disables filters
+- `Log Viewer Plus: Set filter level` - Selects minimum level (ERROR, WARN, INFO, etc.)
+- `Log Viewer Plus: Set search pattern` - Defines search pattern
+- `Log Viewer Plus: Clear search pattern` - Clears search pattern
+- `Log Viewer Plus: Toggle clean format` - Toggles between full and clean format
 
 ## 💡 Usage
 
 ### 1. Open a Log
 
-1. Click on the **Log Viewer** icon in the sidebar
+1. Click on the **Log Viewer Plus** icon in the sidebar
 2. Expand the **Watches** view
 3. Click on the watch you want to see
 4. The file will open automatically and update in real-time
@@ -180,7 +180,7 @@ Access commands with **Ctrl+Shift+P** (Cmd+Shift+P on Mac):
 
 ```json
 {
-  "logViewer.filter": {
+  "logViewerPlus.filter": {
     "enabled": true,
     "searchPattern": "OutOfMemoryError"  // Search for this text
   }
@@ -199,7 +199,7 @@ Or using regex:
 To see only critical errors:
 ```json
 {
-  "logViewer.filter": {
+  "logViewerPlus.filter": {
     "enabled": true,
     "minLevel": "ERROR",
     "cleanFormat": true
@@ -211,7 +211,7 @@ To see only critical errors:
 
 ```json
 {
-  "logViewer.filter": {
+  "logViewerPlus.filter": {
     "enabled": true,
     "excludePatterns": [
       "HealthCheck",
@@ -230,7 +230,7 @@ Controls how many KB from the end of the file are loaded:
 
 ```json
 {
-  "logViewer.chunkSizeKb": 64  // Default: 64KB
+  "logViewerPlus.chunkSizeKb": 64  // Default: 64KB
 }
 ```
 
@@ -238,7 +238,7 @@ Controls how many KB from the end of the file are loaded:
 
 ```json
 {
-  "logViewer.followTailMode": "auto"  // "auto" or "manual"
+  "logViewerPlus.followTailMode": "auto"  // "auto" or "manual"
 }
 ```
 
@@ -251,7 +251,7 @@ Shows a notification in the status bar when a watch changes:
 
 ```json
 {
-  "logViewer.showStatusBarItemOnChange": true  // Default: false
+  "logViewerPlus.showStatusBarItemOnChange": true  // Default: false
 }
 ```
 
@@ -261,7 +261,7 @@ Logging level to debug the extension:
 
 ```json
 {
-  "logViewer.logLevel": "error"  // "trace", "debug", "info", "warn", "error"
+  "logViewerPlus.logLevel": "error"  // "trace", "debug", "info", "warn", "error"
 }
 ```
 
@@ -357,7 +357,7 @@ The extension uses [picomatch](https://github.com/micromatch/picomatch) for glob
 
 ```json
 {
-  "logViewer.watch": [
+  "logViewerPlus.watch": [
     "/logs/**/*.log",                    // All .log recursively
     "/var/log/app-{dev,prod}.log",      // app-dev.log or app-prod.log
     "/logs/error-202[0-9]*.log",        // error-2020*.log through error-2029*.log
@@ -381,14 +381,14 @@ The extension uses [picomatch](https://github.com/micromatch/picomatch) for glob
 1. Reduce `chunkSizeKb`:
 ```json
 {
-  "logViewer.chunkSizeKb": 32
+  "logViewerPlus.chunkSizeKb": 32
 }
 ```
 
 2. Increase intervals:
 ```json
 {
-  "logViewer.options": {
+  "logViewerPlus.options": {
     "fileCheckInterval": 1000,
     "fileListInterval": 5000
   }
@@ -406,7 +406,7 @@ The extension uses [picomatch](https://github.com/micromatch/picomatch) for glob
 Specify the correct encoding:
 ```json
 {
-  "logViewer.options": {
+  "logViewerPlus.options": {
     "encoding": "latin1"  // or "utf16le", "iso-8859-1", etc.
   }
 }
@@ -424,7 +424,7 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 ```json
 {
-  "logViewer.watch": [
+  "logViewerPlus.watch": [
     {
       "groupName": "Local",
       "watches": [
@@ -439,7 +439,7 @@ MIT License - See [LICENSE](LICENSE) for details.
       ]
     }
   ],
-  "logViewer.filter": {
+  "logViewerPlus.filter": {
     "enabled": true,
     "minLevel": "WARN",
     "cleanFormat": true
@@ -451,7 +451,7 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 ```json
 {
-  "logViewer.filter": {
+  "logViewerPlus.filter": {
     "enabled": true,
     "searchPattern": "(OutOfMemory|NullPointer|SQLException)",
     "minLevel": "ERROR",
@@ -464,7 +464,7 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 ```json
 {
-  "logViewer.filter": {
+  "logViewerPlus.filter": {
     "enabled": true,
     "excludePatterns": [
       "HealthCheck",
@@ -481,7 +481,7 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 ```json
 {
-  "logViewer.watch": [
+  "logViewerPlus.watch": [
     {
       "groupName": "Production",
       "watches": [

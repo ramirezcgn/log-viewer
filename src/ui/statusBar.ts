@@ -5,11 +5,11 @@ import { openLogResourceCmd } from "../ui/logExplorer";
 import type { LogWatchProvider, WatchState } from "../core/logProvider";
 import { fromLogUri, LogViewerSchema } from "../core/logUri";
 
-const toggleFollowTailCmd = "logviewer.toggleFollowTail";
-const clearCmd = "logviewer.clearLogView";
-const resetCmd = "logviewer.resetLogView";
-const openCurrentFileCmd = "logviewer.openCurrentFile";
-const openLastChangedCmd = "logviewer.openLastChanged";
+const toggleFollowTailCmd = "logviewerplus.toggleFollowTail";
+const clearCmd = "logviewerplus.clearLogView";
+const resetCmd = "logviewerplus.resetLogView";
+const openCurrentFileCmd = "logviewerplus.openCurrentFile";
+const openLastChangedCmd = "logviewerplus.openLastChanged";
 
 interface StatusBarComponent {
     show(): void;

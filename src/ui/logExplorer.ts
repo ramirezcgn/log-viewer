@@ -5,11 +5,11 @@ import type { ConfigService } from "../types/configService";
 import { EventType, type LogWatchProvider } from "../core/logProvider";
 import { LogViewerSchema, toLogUri } from "../core/logUri";
 
-export const openLogResourceCmd = "logviewer.openLogResource";
-const unwatchCmd = "logviewer.unwatchLogResource";
-const unwatchAllCmd = "logviewer.unwatchAll";
-const selectFilesCmd = "logviewer.selectFiles";
-const removeWatchCmd = "logviewer.removeWatch";
+export const openLogResourceCmd = "logviewerplus.openLogResource";
+const unwatchCmd = "logviewerplus.unwatchLogResource";
+const unwatchAllCmd = "logviewerplus.unwatchAll";
+const selectFilesCmd = "logviewerplus.selectFiles";
+const removeWatchCmd = "logviewerplus.removeWatch";
 
 interface GroupItem {
     readonly id: string;
@@ -132,7 +132,7 @@ class LogExplorer implements vscode.TreeDataProvider<Item>, vscode.Disposable {
                 : `${element.label}: ${element.value}`;
             if (element.level) {
                 item.command = {
-                    command: "logviewer.filterByLevel",
+                    command: "logviewerplus.filterByLevel",
                     arguments: [element.level],
                     title: `Filter by ${element.level}`,
                 };
@@ -394,7 +394,7 @@ export function registerLogExplorer(
                     return;
                 }
 
-                const config = vscode.workspace.getConfiguration("logViewer");
+                const config = vscode.workspace.getConfiguration("logViewerPlus");
                 const currentWatch = config.get<unknown[]>("watch") || [];
 
                 // Remove only the first matching entry
@@ -449,7 +449,7 @@ export function registerLogExplorer(
                     return;
                 }
 
-                const config = vscode.workspace.getConfiguration("logViewer");
+                const config = vscode.workspace.getConfiguration("logViewerPlus");
                 const currentWatch = config.get<unknown[]>("watch") || [];
 
                 // Collect existing patterns to avoid duplicates

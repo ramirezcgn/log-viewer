@@ -81,7 +81,7 @@ function updateDiagnostics(doc: vscode.TextDocument): void {
             seenLines.add(line);
             const lineRange = doc.lineAt(line).range;
             const diag = new vscode.Diagnostic(lineRange, match[0], severity);
-            diag.source = "log-viewer";
+            diag.source = "log-viewer-plus";
             diagnostics.push(diag);
         }
     }
@@ -206,7 +206,7 @@ function updateDecorations(editor: vscode.TextEditor): void {
 // ── Registration ─────────────────────────────────────────────────────────
 
 export function registerLogDecorations(subs: vscode.Disposable[]): void {
-    diagnosticCollection = vscode.languages.createDiagnosticCollection("log-viewer");
+    diagnosticCollection = vscode.languages.createDiagnosticCollection("log-viewer-plus");
 
     subs.push(
         diagnosticCollection,

@@ -1,8 +1,9 @@
 {
-  "name": "log-viewer",
-  "displayName": "Log Viewer",
+  "name": "log-viewer-plus",
+  "displayName": "Log Viewer Plus",
   "description": "A VS Code extension for viewing and filtering logs",
   "version": "0.0.1",
+  "publisher": "nicolasramirez",
   "author": "ramirezcgn",
   "keywords": [
     "log",
@@ -11,13 +12,13 @@
     "vscode"
   ],
   "bugs": {
-    "url": "https://github.com/ramirezcgn/log-viewer/issues"
+    "url": "https://github.com/ramirezcgn/log-viewer-plus/issues"
   },
-  "homepage": "https://github.com/ramirezcgn/log-viewer#readme",
+  "homepage": "https://github.com/ramirezcgn/log-viewer-plus#readme",
   "icon": "images/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ramirezcgn/log-viewer.git"
+    "url": "https://github.com/ramirezcgn/log-viewer-plus.git"
   },
   "license": "MIT",
   "engines": {
@@ -32,7 +33,7 @@
   "main": "./dist/extension.js",
   "contributes": {
     "views": {
-      "log-viewer": [
+      "log-viewer-plus": [
         {
           "id": "logExplorer",
           "name": "Watches",
@@ -43,77 +44,77 @@
     "menus": {
       "view/title": [
         {
-          "command": "logviewer.selectFiles",
+          "command": "logviewerplus.selectFiles",
           "when": "view == logExplorer",
           "group": "navigation"
         },
         {
-          "command": "logviewer.unwatchAll",
+          "command": "logviewerplus.unwatchAll",
           "when": "view == logExplorer",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
-          "command": "logviewer.unwatchLogResource",
+          "command": "logviewerplus.unwatchLogResource",
           "when": "viewItem == watchItem-watching",
           "group": "inline"
         },
         {
-          "command": "logviewer.removeWatch",
+          "command": "logviewerplus.removeWatch",
           "when": "viewItem == watchItem || viewItem == watchItem-watching",
           "group": "inline"
         }
       ],
       "editor/title": [
         {
-          "command": "logviewer.setSearchPattern",
-          "when": "resourceScheme == 'log-viewer' && !logviewer.searchActive",
+          "command": "logviewerplus.setSearchPattern",
+          "when": "resourceScheme == 'log-viewer-plus' && !logviewerplus.searchActive",
           "group": "navigation@1"
         },
         {
-          "command": "logviewer.clearSearchPattern",
-          "when": "resourceScheme == 'log-viewer' && logviewer.searchActive",
+          "command": "logviewerplus.clearSearchPattern",
+          "when": "resourceScheme == 'log-viewer-plus' && logviewerplus.searchActive",
           "group": "navigation@1"
         },
         {
-          "command": "logviewer.setFilterLevel",
-          "when": "resourceScheme == 'log-viewer' && !logviewer.levelActive",
+          "command": "logviewerplus.setFilterLevel",
+          "when": "resourceScheme == 'log-viewer-plus' && !logviewerplus.levelActive",
           "group": "navigation@2"
         },
         {
-          "command": "logviewer.setFilterLevelActive",
-          "when": "resourceScheme == 'log-viewer' && logviewer.levelActive",
+          "command": "logviewerplus.setFilterLevelActive",
+          "when": "resourceScheme == 'log-viewer-plus' && logviewerplus.levelActive",
           "group": "navigation@2"
         },
         {
-          "command": "logviewer.enableCleanFormat",
-          "when": "resourceScheme == 'log-viewer' && !logviewer.cleanFormatActive",
+          "command": "logviewerplus.enableCleanFormat",
+          "when": "resourceScheme == 'log-viewer-plus' && !logviewerplus.cleanFormatActive",
           "group": "navigation@3"
         },
         {
-          "command": "logviewer.disableCleanFormat",
-          "when": "resourceScheme == 'log-viewer' && logviewer.cleanFormatActive",
+          "command": "logviewerplus.disableCleanFormat",
+          "when": "resourceScheme == 'log-viewer-plus' && logviewerplus.cleanFormatActive",
           "group": "navigation@3"
         },
         {
-          "command": "logviewer.setReadModeFull",
-          "when": "resourceScheme == 'log-viewer' && !logviewer.tailMode",
+          "command": "logviewerplus.setReadModeFull",
+          "when": "resourceScheme == 'log-viewer-plus' && !logviewerplus.tailMode",
           "group": "navigation@4"
         },
         {
-          "command": "logviewer.setReadModeTail",
-          "when": "resourceScheme == 'log-viewer' && logviewer.tailMode",
+          "command": "logviewerplus.setReadModeTail",
+          "when": "resourceScheme == 'log-viewer-plus' && logviewerplus.tailMode",
           "group": "navigation@4"
         },
         {
-          "command": "logviewer.exportFiltered",
-          "when": "resourceScheme == 'log-viewer'",
+          "command": "logviewerplus.exportFiltered",
+          "when": "resourceScheme == 'log-viewer-plus'",
           "group": "navigation@5"
         },
         {
-          "command": "logviewer.configureFilters",
-          "when": "resourceScheme == 'log-viewer'",
+          "command": "logviewerplus.configureFilters",
+          "when": "resourceScheme == 'log-viewer-plus'",
           "group": "navigation@6"
         }
       ]
@@ -121,135 +122,135 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "log-viewer",
-          "title": "Log Viewer",
+          "id": "log-viewer-plus",
+          "title": "Log Viewer Plus",
           "icon": "images/icon.svg"
         }
       ]
     },
     "commands": [
       {
-        "command": "logviewer.toggleFollowTail",
-        "title": "Log Viewer: Toggle follow tail"
+        "command": "logviewerplus.toggleFollowTail",
+        "title": "Log Viewer Plus: Toggle follow tail"
       },
       {
-        "command": "logviewer.clearLogView",
-        "title": "Log Viewer: Clear log view"
+        "command": "logviewerplus.clearLogView",
+        "title": "Log Viewer Plus: Clear log view"
       },
       {
-        "command": "logviewer.resetLogView",
-        "title": "Log Viewer: Reset log view"
+        "command": "logviewerplus.resetLogView",
+        "title": "Log Viewer Plus: Reset log view"
       },
       {
-        "command": "logviewer.unwatchAll",
-        "title": "Log Viewer: Unwatch all"
+        "command": "logviewerplus.unwatchAll",
+        "title": "Log Viewer Plus: Unwatch all"
       },
       {
-        "command": "logviewer.unwatchLogResource",
-        "title": "Log Viewer: Stop watching",
+        "command": "logviewerplus.unwatchLogResource",
+        "title": "Log Viewer Plus: Stop watching",
         "icon": "$(debug-stop)"
       },
       {
-        "command": "logviewer.removeWatch",
-        "title": "Log Viewer: Remove from list",
+        "command": "logviewerplus.removeWatch",
+        "title": "Log Viewer Plus: Remove from list",
         "icon": "$(trash)"
       },
       {
-        "command": "logviewer.openCurrentFile",
-        "title": "Log Viewer: Open current log file"
+        "command": "logviewerplus.openCurrentFile",
+        "title": "Log Viewer Plus: Open current log file"
       },
       {
-        "command": "logviewer.openLastChanged",
-        "title": "Log Viewer: Open the last changed watch"
+        "command": "logviewerplus.openLastChanged",
+        "title": "Log Viewer Plus: Open the last changed watch"
       },
       {
-        "command": "logviewer.showExtensionLogs",
-        "title": "Log Viewer: Show extension logs"
+        "command": "logviewerplus.showExtensionLogs",
+        "title": "Log Viewer Plus: Show extension logs"
       },
       {
-        "command": "logviewer.toggleFilter",
-        "title": "Log Viewer: Toggle log filtering"
+        "command": "logviewerplus.toggleFilter",
+        "title": "Log Viewer Plus: Toggle log filtering"
       },
       {
-        "command": "logviewer.enableFilter",
-        "title": "Log Viewer: Enable filtering",
+        "command": "logviewerplus.enableFilter",
+        "title": "Log Viewer Plus: Enable filtering",
         "icon": "$(filter)"
       },
       {
-        "command": "logviewer.disableFilter",
-        "title": "Log Viewer: Disable filtering",
+        "command": "logviewerplus.disableFilter",
+        "title": "Log Viewer Plus: Disable filtering",
         "icon": "$(filter-filled)"
       },
       {
-        "command": "logviewer.setFilterLevel",
-        "title": "Log Viewer: Set filter level",
+        "command": "logviewerplus.setFilterLevel",
+        "title": "Log Viewer Plus: Set filter level",
         "icon": "$(list-unordered)"
       },
       {
-        "command": "logviewer.setFilterLevelActive",
-        "title": "Log Viewer: Set filter level",
+        "command": "logviewerplus.setFilterLevelActive",
+        "title": "Log Viewer Plus: Set filter level",
         "icon": "$(filter-filled)"
       },
       {
-        "command": "logviewer.setSearchPattern",
-        "title": "Log Viewer: Set search pattern",
+        "command": "logviewerplus.setSearchPattern",
+        "title": "Log Viewer Plus: Set search pattern",
         "icon": "$(search)"
       },
       {
-        "command": "logviewer.clearSearchPattern",
-        "title": "Log Viewer: Clear search pattern",
+        "command": "logviewerplus.clearSearchPattern",
+        "title": "Log Viewer Plus: Clear search pattern",
         "icon": "$(search-stop)"
       },
       {
-        "command": "logviewer.toggleCleanFormat",
-        "title": "Log Viewer: Toggle clean format"
+        "command": "logviewerplus.toggleCleanFormat",
+        "title": "Log Viewer Plus: Toggle clean format"
       },
       {
-        "command": "logviewer.enableCleanFormat",
-        "title": "Log Viewer: Enable clean format",
+        "command": "logviewerplus.enableCleanFormat",
+        "title": "Log Viewer Plus: Enable clean format",
         "icon": "$(list-tree)"
       },
       {
-        "command": "logviewer.disableCleanFormat",
-        "title": "Log Viewer: Disable clean format",
+        "command": "logviewerplus.disableCleanFormat",
+        "title": "Log Viewer Plus: Disable clean format",
         "icon": "$(list-flat)"
       },
       {
-        "command": "logviewer.configureFilters",
-        "title": "Log Viewer: Configure filters",
+        "command": "logviewerplus.configureFilters",
+        "title": "Log Viewer Plus: Configure filters",
         "icon": "$(settings-gear)"
       },
       {
-        "command": "logviewer.exportFiltered",
-        "title": "Log Viewer: Export filtered log",
+        "command": "logviewerplus.exportFiltered",
+        "title": "Log Viewer Plus: Export filtered log",
         "icon": "$(export)"
       },
       {
-        "command": "logviewer.setReadMode",
-        "title": "Log Viewer: Set read mode",
+        "command": "logviewerplus.setReadMode",
+        "title": "Log Viewer Plus: Set read mode",
         "icon": "$(whole-word)"
       },
       {
-        "command": "logviewer.setReadModeFull",
-        "title": "Log Viewer: Read mode (full file)",
+        "command": "logviewerplus.setReadModeFull",
+        "title": "Log Viewer Plus: Read mode (full file)",
         "icon": "$(whole-word)"
       },
       {
-        "command": "logviewer.setReadModeTail",
-        "title": "Log Viewer: Read mode (tail)",
+        "command": "logviewerplus.setReadModeTail",
+        "title": "Log Viewer Plus: Read mode (tail)",
         "icon": "$(list-selection)"
       },
       {
-        "command": "logviewer.selectFiles",
-        "title": "Log Viewer: Select log files",
+        "command": "logviewerplus.selectFiles",
+        "title": "Log Viewer Plus: Select log files",
         "icon": "$(add)"
       }
     ],
     "configuration": {
-      "title": "Log Viewer",
+      "title": "Log Viewer Plus",
       "type": "object",
       "properties": {
-        "logViewer.watch": {
+        "logViewerPlus.watch": {
           "type": "array",
           "items": {
             "oneOf": [
@@ -295,7 +296,7 @@
                     "type": "string"
                   },
                   "options": {
-                    "description": "Options for this watch (overrides logViewer.options).",
+                    "description": "Options for this watch (overrides logViewerPlus.options).",
                     "type": "object",
                     "properties": {
                       "fileCheckInterval": {
@@ -379,7 +380,7 @@
                               "type": "string"
                             },
                             "options": {
-                              "description": "Options for this watch (overrides logViewer.options).",
+                              "description": "Options for this watch (overrides logViewerPlus.options).",
                               "type": "object",
                               "properties": {
                                 "fileCheckInterval": {
@@ -440,7 +441,7 @@
           "default": [],
           "description": "Glob patterns of files to watch."
         },
-        "logViewer.options": {
+        "logViewerPlus.options": {
           "description": "Global watch options.",
           "type": "object",
           "properties": {
@@ -466,22 +467,22 @@
             }
           }
         },
-        "logViewer.windows.allowBackslashAsPathSeparator": {
+        "logViewerPlus.windows.allowBackslashAsPathSeparator": {
           "type": "boolean",
           "default": true,
           "description": "Allow to use \"\\\" (as well as \"/\") as a path separator on windows. Won't be able to escape certain pattern characters when enabled."
         },
-        "logViewer.showStatusBarItemOnChange": {
+        "logViewerPlus.showStatusBarItemOnChange": {
           "type": "boolean",
           "default": false,
           "description": "Show an item in the status bar when a watched pattern changes, to quickly access it."
         },
-        "logViewer.tailLines": {
+        "logViewerPlus.tailLines": {
           "type": "number",
           "default": 0,
           "description": "Number of lines to show from the end of the file (like tail -n). Use 0 to read the full file."
         },
-        "logViewer.logLevel": {
+        "logViewerPlus.logLevel": {
           "description": "Logging level.",
           "enum": [
             "trace",
@@ -492,7 +493,7 @@
           ],
           "default": "error"
         },
-        "logViewer.followTailMode": {
+        "logViewerPlus.followTailMode": {
           "description": "Follow tail behavior.\n `auto` to start following tail when the end of the log is scrolled into the viewport, and stop following tail when it's scrolled out of the viewport.\n `manual` to only start and stop following tail explicitly.",
           "enum": [
             "auto",
@@ -500,7 +501,7 @@
           ],
           "default": "auto"
         },
-        "logViewer.filter": {
+        "logViewerPlus.filter": {
           "description": "Filter options for log files.",
           "type": "object",
           "properties": {

@@ -15,7 +15,7 @@ export interface ExtensionTestHandles extends LogExplorerTestHandles, StatusBarI
 export function activate(context: vscode.ExtensionContext): ExtensionTestHandles | undefined {
     setDevEnv(context.extensionMode === vscode.ExtensionMode.Development);
 
-    // Close any restored log-viewer tabs from a previous session
+    // Close any restored log-viewer-plus tabs from a previous session
     closeRestoredLogTabs();
 
     const subs = context.subscriptions;
@@ -54,7 +54,7 @@ export function deactivate(): void {
 }
 
 /**
- * Close any log-viewer tabs that VS Code restored from the previous session.
+ * Close any log-viewer-plus tabs that VS Code restored from the previous session.
  * These virtual documents are not editable and have no value when restored.
  */
 function closeRestoredLogTabs(): void {

@@ -8,8 +8,8 @@ export interface WatchForUri {
     readonly workspaceName: string | undefined;
 }
 
-export const LogViewerSchema = "log-viewer";
-const LogViewerAuthority = "logviewer";
+export const LogViewerSchema = "log-viewer-plus";
+const LogViewerAuthority = "logviewerplus";
 
 const BaseUri = vscode.Uri.parse(`${LogViewerSchema}://${LogViewerAuthority}`);
 

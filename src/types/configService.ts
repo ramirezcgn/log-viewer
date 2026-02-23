@@ -32,7 +32,7 @@ interface InternalConfigTypeMap extends ConfigTypeMap {
     watch: ConfigEntry[] | undefined;
 }
 
-const configurationSection = "logViewer";
+const configurationSection = "logViewerPlus";
 
 function hasWorkspace(): boolean {
     return !!vscode.workspace.workspaceFolders?.length;

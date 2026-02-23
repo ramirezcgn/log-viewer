@@ -3,7 +3,7 @@ import { registerInstance } from "../utils/container";
 import { Logger } from "../utils/logger";
 import type { ConfigService } from "../types/configService";
 
-const showExtensionLogsCmd = "logviewer.showExtensionLogs";
+const showExtensionLogsCmd = "logviewerplus.showExtensionLogs";
 
 function inner(x: unknown): string {
     if (typeof x === "string") {
@@ -25,7 +25,7 @@ function toStr(x: unknown): string {
 class OutputChannelLogger extends Logger implements vscode.Disposable {
     private _outputChannel: vscode.OutputChannel | undefined;
     private get outputChannel(): vscode.OutputChannel {
-        this._outputChannel ??= vscode.window.createOutputChannel("log-viewer");
+        this._outputChannel ??= vscode.window.createOutputChannel("log-viewer-plus");
         return this._outputChannel;
     }
     protected log(level: string, x: unknown): void {

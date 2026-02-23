@@ -1,5 +1,5 @@
 /**
- * Filter Commands for Log Viewer
+ * Filter Commands for Log Viewer Plus
  */
 
 import * as vscode from "vscode";
@@ -7,35 +7,35 @@ import type { ConfigService } from "../types/configService";
 import { isFilterActive } from "../types/config";
 import { LogViewerSchema } from "../core/logUri";
 
-const toggleFilterCmd = "logviewer.toggleFilter";
-const enableFilterCmd = "logviewer.enableFilter";
-const disableFilterCmd = "logviewer.disableFilter";
-const setFilterLevelCmd = "logviewer.setFilterLevel";
-const setFilterLevelActiveCmd = "logviewer.setFilterLevelActive";
-const setSearchPatternCmd = "logviewer.setSearchPattern";
-const clearSearchPatternCmd = "logviewer.clearSearchPattern";
-const toggleCleanFormatCmd = "logviewer.toggleCleanFormat";
-const enableCleanFormatCmd = "logviewer.enableCleanFormat";
-const disableCleanFormatCmd = "logviewer.disableCleanFormat";
-const configureFiltersCmd = "logviewer.configureFilters";
-const exportFilteredCmd = "logviewer.exportFiltered";
-const filterByLevelCmd = "logviewer.filterByLevel";
-const setReadModeCmd = "logviewer.setReadMode";
-const setReadModeFullCmd = "logviewer.setReadModeFull";
-const setReadModeTailCmd = "logviewer.setReadModeTail";
+const toggleFilterCmd = "logviewerplus.toggleFilter";
+const enableFilterCmd = "logviewerplus.enableFilter";
+const disableFilterCmd = "logviewerplus.disableFilter";
+const setFilterLevelCmd = "logviewerplus.setFilterLevel";
+const setFilterLevelActiveCmd = "logviewerplus.setFilterLevelActive";
+const setSearchPatternCmd = "logviewerplus.setSearchPattern";
+const clearSearchPatternCmd = "logviewerplus.clearSearchPattern";
+const toggleCleanFormatCmd = "logviewerplus.toggleCleanFormat";
+const enableCleanFormatCmd = "logviewerplus.enableCleanFormat";
+const disableCleanFormatCmd = "logviewerplus.disableCleanFormat";
+const configureFiltersCmd = "logviewerplus.configureFilters";
+const exportFilteredCmd = "logviewerplus.exportFiltered";
+const filterByLevelCmd = "logviewerplus.filterByLevel";
+const setReadModeCmd = "logviewerplus.setReadMode";
+const setReadModeFullCmd = "logviewerplus.setReadModeFull";
+const setReadModeTailCmd = "logviewerplus.setReadModeTail";
 
 let _configSvc: ConfigService;
 
 function updateFilterContextKeys(): void {
     const opts = _configSvc.getEffectiveFilterOptions();
     const active = isFilterActive(opts);
-    void vscode.commands.executeCommand("setContext", "logviewer.filterEnabled", active);
-    void vscode.commands.executeCommand("setContext", "logviewer.levelActive", opts.minLevel !== "ALL" && opts.minLevel !== "TRACE");
-    void vscode.commands.executeCommand("setContext", "logviewer.searchActive", !!opts.searchPattern);
-    void vscode.commands.executeCommand("setContext", "logviewer.cleanFormatActive", opts.cleanFormat);
+    void vscode.commands.executeCommand("setContext", "logviewerplus.filterEnabled", active);
+    void vscode.commands.executeCommand("setContext", "logviewerplus.levelActive", opts.minLevel !== "ALL" && opts.minLevel !== "TRACE");
+    void vscode.commands.executeCommand("setContext", "logviewerplus.searchActive", !!opts.searchPattern);
+    void vscode.commands.executeCommand("setContext", "logviewerplus.cleanFormatActive", opts.cleanFormat);
 
     const tailLines = _configSvc.getEffectiveTailLines();
-    void vscode.commands.executeCommand("setContext", "logviewer.tailMode", tailLines > 0);
+    void vscode.commands.executeCommand("setContext", "logviewerplus.tailMode", tailLines > 0);
 }
 
 async function updateFilterConfig(
