@@ -10,10 +10,15 @@ import { registerLogWatchProvider } from "./core/logProvider";
 import { registerStatusBarItems, type StatusBarItemsTestHandles } from "./ui/statusBar";
 import { LogViewerSchema } from "./core/logUri";
 
+const INSTALLED_VERSION_KEY = "logviewerplus.installedVersion";
+
 export interface ExtensionTestHandles extends LogExplorerTestHandles, StatusBarItemsTestHandles {}
 
 export function activate(context: vscode.ExtensionContext): ExtensionTestHandles | undefined {
     setDevEnv(context.extensionMode === vscode.ExtensionMode.Development);
+
+    // Prompt to reload window on first install for full UI registration
+    promptReloadOnFirstInstall(context);
 
     // Close any restored log-viewer-plus tabs from a previous session
     closeRestoredLogTabs();
@@ -67,5 +72,34 @@ function closeRestoredLogTabs(): void {
 
     for (const tab of logTabs) {
         void vscode.window.tabGroups.close(tab);
+    }
+}
+
+function promptReloadOnFirstInstall(context: vscode.ExtensionContext): void {
+    if (context.extensionMode === vscode.ExtensionMode.Test) {
+        return;
+    }
+
+    const currentVersion: string =
+        (vscode.extensions.getExtension("nicolasramirez.log-viewer-plus")
+            ?.packageJSON as { version?: string })?.version ?? "0.0.0";
+    const previousVersion = context.globalState.get<string>(INSTALLED_VERSION_KEY);
+
+    if (previousVersion !== currentVersion) {
+        void context.globalState.update(INSTALLED_VERSION_KEY, currentVersion);
+
+        if (previousVersion === undefined) {
+            // First-time install
+            void vscode.window
+                .showInformationMessage(
+                    "Log Viewer Plus has been installed. Please reload the window for full functionality.",
+                    "Reload Window",
+                )
+                .then(selection => {
+                    if (selection === "Reload Window") {
+                        void vscode.commands.executeCommand("workbench.action.reloadWindow");
+                    }
+                });
+        }
     }
 }
