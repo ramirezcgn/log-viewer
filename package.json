@@ -3,7 +3,6 @@
   "displayName": "Log Viewer",
   "description": "A VS Code extension for viewing and filtering logs",
   "version": "0.0.1",
-  "publisher": "Nicolas Ramirez",
   "author": "ramirezcgn",
   "keywords": [
     "log",
