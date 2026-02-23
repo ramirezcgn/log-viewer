@@ -516,7 +516,7 @@
                 "TRACE"
               ],
               "default": "ALL",
-              "description": "Minimum log level to display."
+              "description": "Log level to display. Only logs matching this exact level are shown. Use ALL to show all levels."
             },
             "searchPattern": {
               "type": "string",

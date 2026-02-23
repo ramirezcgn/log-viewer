@@ -78,10 +78,10 @@ function showFilterLevelPicker(): Promise<void> {
             const levels = [
                 { label: "ALL", description: "Show all logs (no level filter)", value: "ALL", picked: isAll },
                 { label: "ERROR", description: "Show only ERROR logs", value: "ERROR", picked: currentLevel === "ERROR" },
-                { label: "WARN", description: "Show WARN and above", value: "WARN", picked: currentLevel === "WARN" },
-                { label: "INFO", description: "Show INFO and above", value: "INFO", picked: currentLevel === "INFO" },
-                { label: "DEBUG", description: "Show DEBUG and above", value: "DEBUG", picked: currentLevel === "DEBUG" },
-                { label: "TRACE", description: "Show TRACE and above", value: "TRACE", picked: currentLevel === "TRACE" && !isAll },
+                { label: "WARN", description: "Show only WARN logs", value: "WARN", picked: currentLevel === "WARN" },
+                { label: "INFO", description: "Show only INFO logs", value: "INFO", picked: currentLevel === "INFO" },
+                { label: "DEBUG", description: "Show only DEBUG logs", value: "DEBUG", picked: currentLevel === "DEBUG" },
+                { label: "TRACE", description: "Show only TRACE logs", value: "TRACE", picked: currentLevel === "TRACE" && !isAll },
             ].map(l => ({
                 ...l,
                 description: l.picked ? `${l.description} $(check)` : l.description,

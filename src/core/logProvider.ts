@@ -76,28 +76,30 @@ async function readFileContent(
 function convertFilterOptions(configSvc: ConfigService): LogFilterOptions {
     const filterConfig = configSvc.getEffectiveFilterOptions();
     
-    let minLevel = LogLevel.TRACE;
+    let level = LogLevel.ALL;
     switch (filterConfig.minLevel) {
         case "ERROR":
-            minLevel = LogLevel.ERROR;
+            level = LogLevel.ERROR;
             break;
         case "WARN":
-            minLevel = LogLevel.WARN;
+            level = LogLevel.WARN;
             break;
         case "INFO":
-            minLevel = LogLevel.INFO;
+            level = LogLevel.INFO;
             break;
         case "DEBUG":
-            minLevel = LogLevel.DEBUG;
+            level = LogLevel.DEBUG;
             break;
         case "TRACE":
+            level = LogLevel.TRACE;
+            break;
         case "ALL":
-            minLevel = LogLevel.TRACE;
+            level = LogLevel.ALL;
             break;
     }
 
     return {
-        minLevel,
+        level,
         searchPattern: filterConfig.searchPattern,
         cleanFormat: filterConfig.cleanFormat,
         excludePatterns: filterConfig.excludePatterns,

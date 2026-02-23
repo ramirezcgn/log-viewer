@@ -4,6 +4,7 @@
  */
 
 export enum LogLevel {
+    ALL = 0,
     TRACE = 5,
     DEBUG = 4,
     INFO = 3,
@@ -20,7 +21,7 @@ interface LogLine {
 }
 
 export interface LogFilterOptions {
-    minLevel: LogLevel;
+    level: LogLevel;
     searchPattern?: string;
     searchRegex?: RegExp;
     cleanFormat: boolean;
@@ -149,7 +150,7 @@ function parseLogLine(line: string): LogLine | null {
 }
 
 function isFilterOptionsActive(options: LogFilterOptions): boolean {
-    return options.minLevel !== LogLevel.TRACE
+    return options.level !== LogLevel.ALL
         || !!options.searchPattern
         || !!options.searchRegex
         || options.cleanFormat
@@ -167,9 +168,9 @@ function shouldFilterLine(parsedLine: LogLine | null, options: LogFilterOptions)
         return options.cleanFormat;
     }
 
-    // Filter by level
-    if (parsedLine.level > options.minLevel) {
-        return true; // Filter out (log level is less severe than minimum)
+    // Filter by exact level
+    if (options.level !== LogLevel.ALL && parsedLine.level !== options.level) {
+        return true; // Filter out (log level doesn't match selected level)
     }
 
     // Filter by exclude patterns
