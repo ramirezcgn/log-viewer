@@ -16,26 +16,29 @@ import type { ConfigService } from "../types/configService";
 import { SimpleGlobWatcherConstructable as GlobWatcher, type IGlobWatcher } from "../core/logWatcher";
 import { fromLogUri, LogViewerSchema, toLogUri, type WatchForUri } from "../core/logUri";
 
-function getChunkSize(configSvc: ConfigService) {
-    let chunkSize = configSvc.get("chunkSizeKb");
-    if (!chunkSize || chunkSize <= 0) {
-        chunkSize = 64;
-    }
-    return chunkSize * 1024;
+function getTailLines(configSvc: ConfigService): number {
+    return configSvc.getEffectiveTailLines();
 }
 
 const utf8Encoder = new TextEncoder();
 
-async function lastChunk(
+function tailByLines(content: string, maxLines: number): string {
+    if (maxLines <= 0) {
+        return content;
+    }
+    const lines = content.split("\n");
+    if (lines.length <= maxLines) {
+        return content;
+    }
+    return lines.slice(-maxLines).join("\n");
+}
+
+async function readFileContent(
     file: string,
     decoder: DecoderStream | undefined,
     offset: number | undefined,
     configSvc: ConfigService,
 ): Promise<Uint8Array> {
-    const chunkSize = getChunkSize(configSvc);
-
-    const buffer = Buffer.alloc(2 * chunkSize);
-
     if (!offset || offset < 0) {
         offset = 0;
     }
@@ -46,21 +49,25 @@ async function lastChunk(
         if (partSize <= 0) {
             return new Uint8Array();
         }
-        let res;
-        if (partSize > chunkSize) {
-            const lastChunkSize = partSize % chunkSize;
-            const readSize = chunkSize + lastChunkSize;
-            res = await fd.read(buffer, 0, readSize, stat.size - readSize);
-        } else {
-            res = await fd.read(buffer, 0, partSize, offset);
-        }
+
+        const buffer = Buffer.alloc(partSize);
+        const res = await fd.read(buffer, 0, partSize, offset);
         const buff = res.buffer.subarray(0, res.bytesRead);
+
+        let text: string;
         if (decoder) {
             const decodeRes = decoder.write(buff);
             const decodeTrail = decoder.end();
-            return utf8Encoder.encode(decodeTrail ? decodeRes + decodeTrail : decodeRes);
+            text = decodeTrail ? decodeRes + decodeTrail : decodeRes;
+        } else {
+            text = new TextDecoder("utf-8").decode(buff);
         }
-        return new Uint8Array(buff);
+
+        // Apply tail lines limit
+        const maxLines = getTailLines(configSvc);
+        text = tailByLines(text, maxLines);
+
+        return utf8Encoder.encode(text);
     } finally {
         await fd.close();
     }
@@ -299,7 +306,7 @@ export class LogWatchProvider implements vscode.Disposable {
 
         let newRawBytes: Uint8Array | undefined =
             filename
-                ? await lastChunk(filename, state.decoder, state.offset, this.configSvc)
+                ? await readFileContent(filename, state.decoder, state.offset, this.configSvc)
                 : undefined;
 
         // Apply filters to the content

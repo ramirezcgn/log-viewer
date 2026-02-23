@@ -96,6 +96,13 @@ const builtInFormats: LogFormat[] = [
 let activeFormats: LogFormat[] = [...builtInFormats];
 
 /**
+ * Returns the currently active formats (built-in + custom).
+ */
+export function getActiveFormats(): readonly LogFormat[] {
+    return activeFormats;
+}
+
+/**
  * Set custom log formats. If provided, they are tried first, then built-in formats.
  */
 export function setCustomFormats(customFormats: LogFormat[]): void {

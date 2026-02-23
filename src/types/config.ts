@@ -53,7 +53,7 @@ export interface ConfigTypeMap {
     options: Partial<WatchOptions>;
     windows: WindowsConfig;
     showStatusBarItemOnChange: boolean;
-    chunkSizeKb: number;
+    tailLines: number;
     logLevel: keyof typeof LogLevel;
     followTailMode: "auto" | "manual";
     filter: Partial<FilterOptions>;
@@ -68,6 +68,9 @@ export interface IConfigService {
     getWatches(): WatchEntry[];
     getEffectiveWatchOptions(watchId: number): WatchOptions;
     getEffectiveFilterOptions(): FilterOptions;
+    getEffectiveTailLines(): number;
+    setFilterOverrides(updates: Partial<FilterOptions>): Promise<void>;
+    setTailLines(value: number): Promise<void>;
 
     onChange: Event<void>;
 }

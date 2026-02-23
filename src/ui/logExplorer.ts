@@ -341,6 +341,11 @@ export function registerLogExplorer(
                     return;
                 }
                 try {
+                    // Reset level filter when clicking on the file name
+                    const filterOpts = configSvc.getEffectiveFilterOptions();
+                    if (filterOpts.minLevel && filterOpts.minLevel !== "ALL" && filterOpts.minLevel !== "TRACE") {
+                        await configSvc.setFilterOverrides({ minLevel: "ALL" });
+                    }
                     await logProvider.startWatch(uri, true);
                     const doc = await vscode.workspace.openTextDocument(uri);
                     await vscode.window.showTextDocument(doc, { preview: false });
@@ -471,14 +476,29 @@ export function registerLogExplorer(
                     return;
                 }
 
-                const target = vscode.workspace.workspaceFolders?.length
-                    ? vscode.ConfigurationTarget.Workspace
-                    : vscode.ConfigurationTarget.Global;
+                if (!vscode.workspace.workspaceFolders?.length) {
+                    for (const entry of newEntries) {
+                        const uri = toLogUri({
+                            id: Date.now() + Math.floor(Math.random() * 1000),
+                            title: entry.title,
+                            pattern: entry.pattern,
+                            workspaceName: undefined,
+                        });
+                        try {
+                            await logProvider.startWatch(uri, true);
+                            const doc = await vscode.workspace.openTextDocument(uri);
+                            await vscode.window.showTextDocument(doc, { preview: false });
+                        } catch (err) {
+                            logger.error(`Failed to open log: ${err}`);
+                        }
+                    }
+                    return;
+                }
 
                 await config.update(
                     "watch",
                     [...currentWatch, ...newEntries],
-                    target,
+                    vscode.ConfigurationTarget.Workspace,
                 );
             }),
         ),

@@ -34,12 +34,20 @@ interface InternalConfigTypeMap extends ConfigTypeMap {
 
 const configurationSection = "logViewer";
 
+function hasWorkspace(): boolean {
+    return !!vscode.workspace.workspaceFolders?.length;
+}
+
 export class ConfigService implements vscode.Disposable, IConfigService {
     private readonly _onChange = new vscode.EventEmitter<void>();
     private config!: vscode.WorkspaceConfiguration & InternalConfigTypeMap;
     private readonly watches: WatchEntry[] = [];
     private readonly watchesById = new Map<number, Watch>();
     private seqId = 0;
+
+    // In-memory overrides (never persisted without a workspace)
+    private readonly _filterOverrides: Partial<FilterOptions> = {};
+    private _tailLinesOverride: number | undefined = undefined;
 
     constructor() {
         this.load();
@@ -144,7 +152,46 @@ export class ConfigService implements vscode.Disposable, IConfigService {
             Object.assign(resultOpts, configFilter);
         }
 
+        // Apply in-memory overrides on top
+        Object.assign(resultOpts, this._filterOverrides);
+
         return resultOpts;
+    }
+
+    public getEffectiveTailLines(): number {
+        if (this._tailLinesOverride !== undefined) {
+            return this._tailLinesOverride;
+        }
+        const fromConfig = this.config.get<number>("tailLines");
+        if (fromConfig === undefined || fromConfig === null || fromConfig < 0) {
+            return 0;
+        }
+        return fromConfig;
+    }
+
+    public async setFilterOverrides(updates: Partial<FilterOptions>): Promise<void> {
+        Object.assign(this._filterOverrides, updates);
+
+        if (hasWorkspace()) {
+            const config = vscode.workspace.getConfiguration(configurationSection);
+            const current = config.get<any>("filter") || {};
+            Object.assign(current, updates);
+            await config.update("filter", current, vscode.ConfigurationTarget.Workspace);
+        } else {
+            // No workspace: just fire change event for in-memory update
+            this._onChange.fire();
+        }
+    }
+
+    public async setTailLines(value: number): Promise<void> {
+        this._tailLinesOverride = value;
+
+        if (hasWorkspace()) {
+            const config = vscode.workspace.getConfiguration(configurationSection);
+            await config.update("tailLines", value, vscode.ConfigurationTarget.Workspace);
+        } else {
+            this._onChange.fire();
+        }
     }
 
     public dispose(): void {

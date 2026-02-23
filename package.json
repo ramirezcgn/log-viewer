@@ -22,7 +22,7 @@
   },
   "license": "MIT",
   "engines": {
-    "vscode": "^1.70.0"
+    "vscode": "^1.80.0"
   },
   "categories": [
     "Programming Languages"
@@ -68,23 +68,23 @@
       ],
       "editor/title": [
         {
-          "command": "logviewer.setFilterLevel",
-          "when": "resourceScheme == 'log-viewer' && !logviewer.levelActive",
-          "group": "navigation@1"
-        },
-        {
-          "command": "logviewer.setFilterLevelActive",
-          "when": "resourceScheme == 'log-viewer' && logviewer.levelActive",
-          "group": "navigation@1"
-        },
-        {
           "command": "logviewer.setSearchPattern",
           "when": "resourceScheme == 'log-viewer' && !logviewer.searchActive",
-          "group": "navigation@2"
+          "group": "navigation@1"
         },
         {
           "command": "logviewer.clearSearchPattern",
           "when": "resourceScheme == 'log-viewer' && logviewer.searchActive",
+          "group": "navigation@1"
+        },
+        {
+          "command": "logviewer.setFilterLevel",
+          "when": "resourceScheme == 'log-viewer' && !logviewer.levelActive",
+          "group": "navigation@2"
+        },
+        {
+          "command": "logviewer.setFilterLevelActive",
+          "when": "resourceScheme == 'log-viewer' && logviewer.levelActive",
           "group": "navigation@2"
         },
         {
@@ -98,14 +98,24 @@
           "group": "navigation@3"
         },
         {
-          "command": "logviewer.configureFilters",
-          "when": "resourceScheme == 'log-viewer'",
+          "command": "logviewer.setReadModeFull",
+          "when": "resourceScheme == 'log-viewer' && !logviewer.tailMode",
+          "group": "navigation@4"
+        },
+        {
+          "command": "logviewer.setReadModeTail",
+          "when": "resourceScheme == 'log-viewer' && logviewer.tailMode",
           "group": "navigation@4"
         },
         {
           "command": "logviewer.exportFiltered",
           "when": "resourceScheme == 'log-viewer'",
           "group": "navigation@5"
+        },
+        {
+          "command": "logviewer.configureFilters",
+          "when": "resourceScheme == 'log-viewer'",
+          "group": "navigation@6"
         }
       ]
     },
@@ -214,6 +224,21 @@
         "command": "logviewer.exportFiltered",
         "title": "Log Viewer: Export filtered log",
         "icon": "$(export)"
+      },
+      {
+        "command": "logviewer.setReadMode",
+        "title": "Log Viewer: Set read mode",
+        "icon": "$(whole-word)"
+      },
+      {
+        "command": "logviewer.setReadModeFull",
+        "title": "Log Viewer: Read mode (full file)",
+        "icon": "$(whole-word)"
+      },
+      {
+        "command": "logviewer.setReadModeTail",
+        "title": "Log Viewer: Read mode (tail)",
+        "icon": "$(list-selection)"
       },
       {
         "command": "logviewer.selectFiles",
@@ -452,10 +477,10 @@
           "default": false,
           "description": "Show an item in the status bar when a watched pattern changes, to quickly access it."
         },
-        "logViewer.chunkSizeKb": {
+        "logViewer.tailLines": {
           "type": "number",
-          "default": 64,
-          "description": "Chunk size in kilobytes used to calculate the size of the last chunk to load in the viewer. The loaded last chunk will always be less than 2 * chunkSizeKb."
+          "default": 0,
+          "description": "Number of lines to show from the end of the file (like tail -n). Use 0 to read the full file."
         },
         "logViewer.logLevel": {
           "description": "Logging level.",
@@ -539,7 +564,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
-    "@types/vscode": "^1.70.0",
+    "@types/vscode": "^1.80.0",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^3.7.1",
