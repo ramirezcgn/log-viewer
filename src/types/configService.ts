@@ -194,6 +194,11 @@ export class ConfigService implements vscode.Disposable, IConfigService {
         }
     }
 
+    public forceReload(): void {
+        this.load();
+        this._onChange.fire();
+    }
+
     public dispose(): void {
         this._onChange.dispose();
     }

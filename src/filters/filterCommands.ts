@@ -30,7 +30,7 @@ function updateFilterContextKeys(): void {
     const opts = _configSvc.getEffectiveFilterOptions();
     const active = isFilterActive(opts);
     void vscode.commands.executeCommand("setContext", "logviewerplus.filterEnabled", active);
-    void vscode.commands.executeCommand("setContext", "logviewerplus.levelActive", opts.minLevel !== "ALL" && opts.minLevel !== "TRACE");
+    void vscode.commands.executeCommand("setContext", "logviewerplus.levelActive", opts.minLevel !== "ALL");
     void vscode.commands.executeCommand("setContext", "logviewerplus.searchActive", !!opts.searchPattern);
     void vscode.commands.executeCommand("setContext", "logviewerplus.cleanFormatActive", opts.cleanFormat);
 
@@ -73,23 +73,21 @@ function showFilterLevelPicker(): Promise<void> {
         void (async () => {
             const filterOpts = _configSvc.getEffectiveFilterOptions();
             const currentLevel = filterOpts.minLevel || "ALL";
-            const isAll = currentLevel === "ALL" || currentLevel === "TRACE";
 
             const levels = [
-                { label: "ALL", description: "Show all logs (no level filter)", value: "ALL", picked: isAll },
+                { label: "ALL", description: "Show all logs (no level filter)", value: "ALL", picked: currentLevel === "ALL" },
                 { label: "ERROR", description: "Show only ERROR logs", value: "ERROR", picked: currentLevel === "ERROR" },
                 { label: "WARN", description: "Show only WARN logs", value: "WARN", picked: currentLevel === "WARN" },
                 { label: "INFO", description: "Show only INFO logs", value: "INFO", picked: currentLevel === "INFO" },
                 { label: "DEBUG", description: "Show only DEBUG logs", value: "DEBUG", picked: currentLevel === "DEBUG" },
-                { label: "TRACE", description: "Show only TRACE logs", value: "TRACE", picked: currentLevel === "TRACE" && !isAll },
+                { label: "TRACE", description: "Show only TRACE logs", value: "TRACE", picked: currentLevel === "TRACE" },
             ].map(l => ({
                 ...l,
                 description: l.picked ? `${l.description} $(check)` : l.description,
             }));
 
-            const displayLevel = isAll ? "ALL" : currentLevel;
             const level = await vscode.window.showQuickPick(levels, {
-                placeHolder: `Current: ${displayLevel} — Select minimum log level`,
+                placeHolder: `Current: ${currentLevel} — Select log level to show`,
             });
 
             if (level) {
@@ -181,7 +179,7 @@ function registerConfigureFilters(subs: vscode.Disposable[]): void {
         vscode.commands.registerCommand(configureFiltersCmd, async () => {
             const filterOpts = _configSvc.getEffectiveFilterOptions();
 
-            const hasLevelFilter = filterOpts.minLevel && filterOpts.minLevel !== "ALL" && filterOpts.minLevel !== "TRACE";
+            const hasLevelFilter = filterOpts.minLevel && filterOpts.minLevel !== "ALL";
             const hasSearchFilter = !!filterOpts.searchPattern;
             const hasAnyFilter = hasLevelFilter || hasSearchFilter || filterOpts.cleanFormat;
 
@@ -319,7 +317,7 @@ export function createFilterStatusBarItem(
         const active = isFilterActive(filterOptions);
         if (active) {
             const parts: string[] = [];
-            if (filterOptions.minLevel !== "ALL" && filterOptions.minLevel !== "TRACE") {
+            if (filterOptions.minLevel !== "ALL") {
                 parts.push(`Level: ${filterOptions.minLevel}`);
             }
             if (filterOptions.searchPattern) {

@@ -14,7 +14,9 @@
 			],
 			"outFiles": [
 				"${workspaceFolder}/dist/**/*.js"
-			]
+			],
+			"preLaunchTask": "watch",
+			"timeout": 30000
 		}
 	]
 }

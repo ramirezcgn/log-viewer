@@ -343,7 +343,7 @@ export function registerLogExplorer(
                 try {
                     // Reset level filter when clicking on the file name
                     const filterOpts = configSvc.getEffectiveFilterOptions();
-                    if (filterOpts.minLevel && filterOpts.minLevel !== "ALL" && filterOpts.minLevel !== "TRACE") {
+                    if (filterOpts.minLevel && filterOpts.minLevel !== "ALL") {
                         await configSvc.setFilterOverrides({ minLevel: "ALL" });
                     }
                     await logProvider.startWatch(uri, true);
@@ -476,30 +476,38 @@ export function registerLogExplorer(
                     return;
                 }
 
+                const target = vscode.workspace.workspaceFolders?.length
+                    ? vscode.ConfigurationTarget.Workspace
+                    : vscode.ConfigurationTarget.Global;
+
+                const updatedWatch = [...currentWatch, ...newEntries];
+                await config.update("watch", updatedWatch, target);
+
                 if (!vscode.workspace.workspaceFolders?.length) {
-                    for (const entry of newEntries) {
-                        const uri = toLogUri({
-                            id: Date.now() + Math.floor(Math.random() * 1000),
-                            title: entry.title,
-                            pattern: entry.pattern,
-                            workspaceName: undefined,
-                        });
-                        try {
-                            await logProvider.startWatch(uri, true);
-                            const doc = await vscode.workspace.openTextDocument(uri);
-                            await vscode.window.showTextDocument(doc, { preview: false });
-                        } catch (err) {
-                            logger.error(`Failed to open log: ${err}`);
+                    configSvc.forceReload();
+
+                    // Auto-open newly added watches
+                    const flattenWatches = (entries: import("../types/config").WatchEntry[]): import("../types/config").Watch[] =>
+                        entries.flatMap(e => e.kind === "group" ? flattenWatches(e.watches as import("../types/config").WatchEntry[]) : [e]);
+
+                    for (const w of flattenWatches(configSvc.getWatches())) {
+                        const pat = Array.isArray(w.pattern) ? w.pattern[0] : w.pattern;
+                        if (newEntries.some(e => e.pattern === pat)) {
+                            const uri = toLogUri({
+                                id: w.id,
+                                title: w.title,
+                                pattern: w.pattern,
+                                workspaceName: undefined,
+                            });
+                            try {
+                                const doc = await vscode.workspace.openTextDocument(uri);
+                                await vscode.window.showTextDocument(doc, { preview: false });
+                            } catch (err) {
+                                logger.error(`Failed to open log: ${err}`);
+                            }
                         }
                     }
-                    return;
                 }
-
-                await config.update(
-                    "watch",
-                    [...currentWatch, ...newEntries],
-                    vscode.ConfigurationTarget.Workspace,
-                );
             }),
         ),
     );

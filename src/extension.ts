@@ -76,7 +76,7 @@ function closeRestoredLogTabs(): void {
 }
 
 function promptReloadOnFirstInstall(context: vscode.ExtensionContext): void {
-    if (context.extensionMode === vscode.ExtensionMode.Test) {
+    if (context.extensionMode !== vscode.ExtensionMode.Production) {
         return;
     }
 

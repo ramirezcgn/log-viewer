@@ -42,7 +42,7 @@ export interface FilterOptions {
 }
 
 export function isFilterActive(opts: FilterOptions): boolean {
-    return opts.minLevel !== "ALL" && opts.minLevel !== "TRACE"
+    return opts.minLevel !== "ALL"
         || !!opts.searchPattern
         || opts.cleanFormat
         || (!!opts.excludePatterns && opts.excludePatterns.length > 0)
@@ -71,6 +71,7 @@ export interface IConfigService {
     getEffectiveTailLines(): number;
     setFilterOverrides(updates: Partial<FilterOptions>): Promise<void>;
     setTailLines(value: number): Promise<void>;
+    forceReload(): void;
 
     onChange: Event<void>;
 }
