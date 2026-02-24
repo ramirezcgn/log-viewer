@@ -2,7 +2,7 @@
   "name": "log-viewer-plus",
   "displayName": "Log Viewer Plus",
   "description": "A VS Code extension for viewing and filtering logs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "nicolasramirez",
   "author": "ramirezcgn",
   "keywords": [

@@ -182,17 +182,13 @@ function registerConfigureFilters(subs: vscode.Disposable[]): void {
             const hasLevelFilter = filterOpts.minLevel && filterOpts.minLevel !== "ALL";
             const hasSearchFilter = !!filterOpts.searchPattern;
             const hasAnyFilter = hasLevelFilter || hasSearchFilter || filterOpts.cleanFormat;
+            const tailLines = _configSvc.getEffectiveTailLines();
 
             const options = [
                 {
                     label: `$(${hasAnyFilter ? "check" : "circle-outline"}) Clear All Filters`,
                     description: hasAnyFilter ? "Filters are active" : "No active filters",
                     action: "clearAll",
-                },
-                {
-                    label: `$(${hasLevelFilter ? "filter-filled" : "list-unordered"}) Set Filter Level`,
-                    description: `Current: ${!filterOpts.minLevel || filterOpts.minLevel === "ALL" || filterOpts.minLevel === "TRACE" ? "ALL" : filterOpts.minLevel}`,
-                    action: "setLevel",
                 },
                 {
                     label: `$(${hasSearchFilter ? "search-stop" : "search"}) Set Search Pattern`,
@@ -202,11 +198,21 @@ function registerConfigureFilters(subs: vscode.Disposable[]): void {
                     action: "setPattern",
                 },
                 {
+                    label: `$(${hasLevelFilter ? "filter-filled" : "list-unordered"}) Set Filter Level`,
+                    description: `Current: ${!filterOpts.minLevel || filterOpts.minLevel === "ALL" || filterOpts.minLevel === "TRACE" ? "ALL" : filterOpts.minLevel}`,
+                    action: "setLevel",
+                },
+                {
                     label: `$(${filterOpts.cleanFormat ? "list-flat" : "list-tree"}) Clean Format`,
                     description: filterOpts.cleanFormat
                         ? "Show message only"
                         : "Show full log line",
                     action: "toggleClean",
+                },
+                {
+                    label: `$(${tailLines > 0 ? "list-selection" : "file"}) Read Mode`,
+                    description: tailLines > 0 ? `Last ${tailLines} lines` : "Full file",
+                    action: "readMode",
                 },
                 {
                     label: "$(export) Export Filtered Log",
@@ -232,6 +238,9 @@ function registerConfigureFilters(subs: vscode.Disposable[]): void {
                         break;
                     case "toggleClean":
                         await vscode.commands.executeCommand(toggleCleanFormatCmd);
+                        break;
+                    case "readMode":
+                        await vscode.commands.executeCommand(setReadModeCmd);
                         break;
                     case "export":
                         await vscode.commands.executeCommand(exportFilteredCmd);
