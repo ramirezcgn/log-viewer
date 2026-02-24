@@ -5,6 +5,9 @@ import { ConfigService } from "./types/configService";
 import { createFilterStatusBarItem, registerFilterCommands } from "./filters/filterCommands";
 import { registerLogExplorer, type LogExplorerTestHandles } from "./ui/logExplorer";
 import { registerLogDecorations } from "./ui/logDecorations";
+import { registerLogDetailPanel } from "./ui/logDetailPanel";
+import { registerBookmarks } from "./ui/logBookmarks";
+import { registerLogNavigation } from "./ui/logNavigation";
 import { registerLogger } from "./utils/vscodeLogger";
 import { registerLogWatchProvider } from "./core/logProvider";
 import { registerStatusBarItems, type StatusBarItemsTestHandles } from "./ui/statusBar";
@@ -43,6 +46,9 @@ export function activate(context: vscode.ExtensionContext): ExtensionTestHandles
     registerFilterCommands(subs, configSvc);
     createFilterStatusBarItem(subs, { configSvc });
     registerLogDecorations(subs);
+    registerLogDetailPanel(subs);
+    registerBookmarks(subs);
+    registerLogNavigation(subs, configSvc);
 
     if (context.extensionMode === vscode.ExtensionMode.Test) {
         return {

@@ -210,7 +210,7 @@ function registerConfigureFilters(subs: vscode.Disposable[]): void {
                     action: "toggleClean",
                 },
                 {
-                    label: `$(${tailLines > 0 ? "list-selection" : "file"}) Read Mode`,
+                    label: `$(${tailLines > 0 ? "list-selection" : "whole-word"}) Read Mode`,
                     description: tailLines > 0 ? `Last ${tailLines} lines` : "Full file",
                     action: "readMode",
                 },

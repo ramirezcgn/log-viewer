@@ -12,7 +12,7 @@ export enum LogLevel {
     ERROR = 1,
 }
 
-interface LogLine {
+export interface LogLine {
     timestamp: string;
     level: LogLevel;
     source: string;  // thread, class, logger name, etc.
@@ -130,9 +130,44 @@ function parseLevelString(levelStr: string): LogLevel {
 }
 
 /**
+ * Checks whether a line starts a new log entry (vs. being a continuation line
+ * like a stack trace or multi-line message).
+ */
+export function isLogEntryStart(line: string): boolean {
+    if (!line.trim()) {
+        return false;
+    }
+    for (const format of activeFormats) {
+        if (format.regex.test(line)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Given a document's lines and a line number, returns the range [startLine, endLine]
+ * of the full log entry (including continuation lines).
+ * startLine is the line that starts the entry; endLine is the last continuation line (inclusive).
+ */
+export function getLogEntryRange(lines: string[], lineNum: number): { start: number; end: number } {
+    // Walk backwards to find the entry start
+    let start = lineNum;
+    while (start > 0 && !isLogEntryStart(lines[start])) {
+        start--;
+    }
+    // Walk forwards to find the entry end
+    let end = start + 1;
+    while (end < lines.length && !isLogEntryStart(lines[end]) && lines[end].trim() !== "") {
+        end++;
+    }
+    return { start, end: end - 1 };
+}
+
+/**
  * Parses a log line trying all active formats
  */
-function parseLogLine(line: string): LogLine | null {
+export function parseLogLine(line: string): LogLine | null {
     for (const format of activeFormats) {
         const match = format.regex.exec(line);
         if (match) {
@@ -242,21 +277,35 @@ export function filterLogContent(content: string, options: LogFilterOptions): st
     const lines = content.split(/\r?\n/);
     const filteredLines: string[] = [];
 
-    for (const line of lines) {
+    let i = 0;
+    while (i < lines.length) {
+        const line = lines[i];
         if (!line.trim()) {
-            continue; // Skip empty lines
+            i++;
+            continue;
         }
 
         const parsed = parseLogLine(line);
-        
-        if (shouldFilterLine(parsed, options)) {
-            continue; // Skip this line
+
+        // Collect continuation lines (lines that don't start a new entry)
+        const entryLines = [line];
+        let j = i + 1;
+        while (j < lines.length && lines[j].trim() !== "" && !isLogEntryStart(lines[j])) {
+            entryLines.push(lines[j]);
+            j++;
         }
 
-        const formatted = formatLogLine(parsed, options);
-        if (formatted) {
-            filteredLines.push(formatted);
+        if (!shouldFilterLine(parsed, options)) {
+            if (options.cleanFormat && parsed) {
+                // In clean format, show message + continuation lines
+                const continuations = entryLines.slice(1);
+                filteredLines.push(parsed.message, ...continuations);
+            } else {
+                filteredLines.push(...entryLines);
+            }
         }
+
+        i = j;
     }
 
     return filteredLines.join("\n");

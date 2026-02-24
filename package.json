@@ -2,7 +2,7 @@
   "name": "log-viewer-plus",
   "displayName": "Log Viewer Plus",
   "description": "A VS Code extension for viewing and filtering logs",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "nicolasramirez",
   "author": "ramirezcgn",
   "keywords": [
@@ -39,6 +39,14 @@
           "name": "Watches",
           "icon": "images/icon.svg"
         }
+      ],
+      "logDetailPanel": [
+        {
+          "type": "webview",
+          "id": "logviewerplus.logDetail",
+          "name": "Log Detail",
+          "when": "logviewerplus.hasOpenLog"
+        }
       ]
     },
     "menus": {
@@ -64,6 +72,55 @@
           "command": "logviewerplus.removeWatch",
           "when": "viewItem == watchItem || viewItem == watchItem-watching",
           "group": "inline"
+        }
+      ],
+      "editor/lineNumber/context": [
+        {
+          "command": "logviewerplus.toggleBookmark",
+          "when": "resourceScheme == 'log-viewer-plus'",
+          "group": "bookmarks"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "logviewerplus.toggleBookmark",
+          "when": "resourceScheme == 'log-viewer-plus'",
+          "group": "bookmarks@1"
+        },
+        {
+          "command": "logviewerplus.nextBookmark",
+          "when": "resourceScheme == 'log-viewer-plus'",
+          "group": "bookmarks@2"
+        },
+        {
+          "command": "logviewerplus.prevBookmark",
+          "when": "resourceScheme == 'log-viewer-plus'",
+          "group": "bookmarks@3"
+        },
+        {
+          "command": "logviewerplus.clearBookmarks",
+          "when": "resourceScheme == 'log-viewer-plus'",
+          "group": "bookmarks@4"
+        },
+        {
+          "command": "logviewerplus.nextError",
+          "when": "resourceScheme == 'log-viewer-plus'",
+          "group": "logNav@1"
+        },
+        {
+          "command": "logviewerplus.prevError",
+          "when": "resourceScheme == 'log-viewer-plus'",
+          "group": "logNav@2"
+        },
+        {
+          "command": "logviewerplus.nextWarning",
+          "when": "resourceScheme == 'log-viewer-plus'",
+          "group": "logNav@3"
+        },
+        {
+          "command": "logviewerplus.prevWarning",
+          "when": "resourceScheme == 'log-viewer-plus'",
+          "group": "logNav@4"
         }
       ],
       "editor/title": [
@@ -124,6 +181,13 @@
         {
           "id": "log-viewer-plus",
           "title": "Log Viewer Plus",
+          "icon": "images/icon.svg"
+        }
+      ],
+      "panel": [
+        {
+          "id": "logDetailPanel",
+          "title": "Log Detail",
           "icon": "images/icon.svg"
         }
       ]
@@ -244,6 +308,73 @@
         "command": "logviewerplus.selectFiles",
         "title": "Log Viewer Plus: Select log files",
         "icon": "$(add)"
+      },
+      {
+        "command": "logviewerplus.toggleBookmark",
+        "title": "Log Viewer Plus: Toggle bookmark",
+        "icon": "$(bookmark)"
+      },
+      {
+        "command": "logviewerplus.nextBookmark",
+        "title": "Log Viewer Plus: Next bookmark",
+        "icon": "$(arrow-down)"
+      },
+      {
+        "command": "logviewerplus.prevBookmark",
+        "title": "Log Viewer Plus: Previous bookmark",
+        "icon": "$(arrow-up)"
+      },
+      {
+        "command": "logviewerplus.clearBookmarks",
+        "title": "Log Viewer Plus: Clear all bookmarks"
+      },
+      {
+        "command": "logviewerplus.nextError",
+        "title": "Log Viewer Plus: Go to next error",
+        "icon": "$(arrow-down)"
+      },
+      {
+        "command": "logviewerplus.prevError",
+        "title": "Log Viewer Plus: Go to previous error",
+        "icon": "$(arrow-up)"
+      },
+      {
+        "command": "logviewerplus.nextWarning",
+        "title": "Log Viewer Plus: Go to next warning"
+      },
+      {
+        "command": "logviewerplus.prevWarning",
+        "title": "Log Viewer Plus: Go to previous warning"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "logviewerplus.toggleBookmark",
+        "key": "ctrl+alt+b",
+        "mac": "cmd+alt+b",
+        "when": "resourceScheme == 'log-viewer-plus'"
+      },
+      {
+        "command": "logviewerplus.nextBookmark",
+        "key": "ctrl+alt+n",
+        "mac": "cmd+alt+n",
+        "when": "resourceScheme == 'log-viewer-plus'"
+      },
+      {
+        "command": "logviewerplus.prevBookmark",
+        "key": "ctrl+alt+p",
+        "mac": "cmd+alt+p",
+        "when": "resourceScheme == 'log-viewer-plus'"
+      },
+      {
+        "command": "logviewerplus.nextError",
+        "key": "F8",
+        "when": "resourceScheme == 'log-viewer-plus'"
+      },
+      {
+        "command": "logviewerplus.prevError",
+        "key": "shift+F8",
+        "when": "resourceScheme == 'log-viewer-plus'"
       }
     ],
     "configuration": {
