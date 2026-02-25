@@ -5,12 +5,14 @@
 
 import * as vscode from "vscode";
 import { LogViewerSchema } from "../core/logUri";
-import { parseLogLine, LogLevel, type LogLine, getLogEntryRange } from "../filters/logFilter";
+import { parseLogLine, LogLevel, type LogLine, getLogEntryRange, isLogEntryStart } from "../filters/logFilter";
+import type { LogWatchProvider } from "../core/logProvider";
+import { EventType } from "../core/logProvider";
 
 export const LOG_DETAIL_VIEW_ID = "logviewerplus.logDetail";
 
-export function registerLogDetailPanel(subs: vscode.Disposable[]): void {
-    const provider = new LogDetailViewProvider();
+export function registerLogDetailPanel(logProvider: LogWatchProvider, subs: vscode.Disposable[]): void {
+    const provider = new LogDetailViewProvider(logProvider);
 
     // Track whether any log document tab is open and set context key
     function updateHasOpenLog(): void {
@@ -27,6 +29,15 @@ export function registerLogDetailPanel(subs: vscode.Disposable[]): void {
     subs.push(
         vscode.window.registerWebviewViewProvider(LOG_DETAIL_VIEW_ID, provider),
         vscode.window.tabGroups.onDidChangeTabs(() => updateHasOpenLog()),
+        logProvider.onChange(e => {
+            if (e.type === EventType.ContentChange || e.type === EventType.FileChange) {
+                const editor = vscode.window.activeTextEditor;
+                if (editor?.document.uri.toString() === e.uri.toString()) {
+                    provider.invalidate();
+                    provider.updateLine(editor.document, editor.selection.active.line);
+                }
+            }
+        }),
         vscode.window.onDidChangeTextEditorSelection(e => {
             const doc = e.textEditor.document;
             if (doc.uri.scheme !== LogViewerSchema) {
@@ -53,6 +64,8 @@ class LogDetailViewProvider implements vscode.WebviewViewProvider {
     private _view?: vscode.WebviewView;
     private _lastLineNum = -1;
     private _lastEntryStart = -1;
+
+    constructor(private readonly _logProvider: LogWatchProvider) {}
 
     resolveWebviewView(
         webviewView: vscode.WebviewView,
@@ -86,7 +99,39 @@ class LogDetailViewProvider implements vscode.WebviewViewProvider {
             return;
         }
 
-        // Find the entry range for this line
+        const watchState = this._logProvider.get(doc.uri);
+
+        if (watchState?.lineMap && watchState.rawBytes) {
+            const lineMap = watchState.lineMap;
+            const rawText = new TextDecoder("utf-8").decode(watchState.rawBytes);
+            const rawLines = rawText.split(/\r?\n/);
+            let filteredEntryStart = lineNum;
+            while (filteredEntryStart > 0) {
+                const rawIdx = lineMap[filteredEntryStart];
+                if (rawIdx !== undefined && isLogEntryStart(rawLines[rawIdx] ?? "")) {
+                    break;
+                }
+                filteredEntryStart--;
+            }
+            if (filteredEntryStart === this._lastEntryStart) {
+                return;
+            }
+            this._lastEntryStart = filteredEntryStart;
+            this._lastLineNum = lineNum;
+            const rawIdx = lineMap[filteredEntryStart];
+            if (rawIdx === undefined || !rawLines[rawIdx]?.trim()) {
+                this._renderEmpty();
+                return;
+            }
+            const rawFirstLine = rawLines[rawIdx];
+            const rawRange = getLogEntryRange(rawLines, rawIdx);
+            const rawContinuations = rawLines.slice(rawRange.start + 1, rawRange.end + 1);
+            const parsedRaw = parseLogLine(rawFirstLine);
+            this._renderLine(parsedRaw, rawFirstLine, filteredEntryStart, rawContinuations);
+            return;
+        }
+
+        // ── Normal mode ────────────────────────────────────────────────────────
         const allLines: string[] = [];
         for (let i = 0; i < doc.lineCount; i++) {
             allLines.push(doc.lineAt(i).text);
@@ -108,8 +153,8 @@ class LogDetailViewProvider implements vscode.WebviewViewProvider {
             return;
         }
 
-        const parsed = parseLogLine(firstLine);
         const continuationLines = entryLines.slice(1);
+        const parsed = parseLogLine(firstLine);
         this._renderLine(parsed, firstLine, range.start, continuationLines);
     }
 
@@ -119,39 +164,69 @@ class LogDetailViewProvider implements vscode.WebviewViewProvider {
         this._renderEmpty();
     }
 
+    invalidate(): void {
+        this._lastLineNum = -1;
+        this._lastEntryStart = -1;
+    }
+
     private _navigateLine(delta: number): void {
         const editor = vscode.window.activeTextEditor;
         if (editor?.document.uri.scheme !== LogViewerSchema) {
             return;
         }
         const doc = editor.document;
-        const allLines: string[] = [];
-        for (let i = 0; i < doc.lineCount; i++) {
-            allLines.push(doc.lineAt(i).text);
-        }
 
-        // Find current entry range
-        const currentRange = getLogEntryRange(allLines, this._lastLineNum);
+        const watchState = this._logProvider.get(doc.uri);
 
         let target: number;
-        if (delta > 0) {
-            // Next entry: jump past end of current entry
-            target = currentRange.end + 1;
-            // Skip empty lines
-            while (target < doc.lineCount && !allLines[target].trim()) {
-                target++;
+
+        if (watchState?.lineMap && watchState.rawBytes) {
+            const lineMap = watchState.lineMap;
+            const rawText = new TextDecoder("utf-8").decode(watchState.rawBytes);
+            const rawLines = rawText.split(/\r?\n/);
+
+            if (delta > 0) {
+                target = this._lastEntryStart + 1;
+                while (target < doc.lineCount) {
+                    const rawIdx = lineMap[target];
+                    if (rawIdx !== undefined && isLogEntryStart(rawLines[rawIdx] ?? "")) {
+                        break;
+                    }
+                    target++;
+                }
+            } else {
+                target = this._lastEntryStart - 1;
+                while (target >= 0) {
+                    const rawIdx = lineMap[target];
+                    if (rawIdx !== undefined && isLogEntryStart(rawLines[rawIdx] ?? "")) {
+                        break;
+                    }
+                    target--;
+                }
             }
         } else {
-            // Previous entry: jump before start of current entry
-            target = currentRange.start - 1;
-            // Skip empty lines
-            while (target >= 0 && !allLines[target].trim()) {
-                target--;
+            // Normal mode
+            const allLines: string[] = [];
+            for (let i = 0; i < doc.lineCount; i++) {
+                allLines.push(doc.lineAt(i).text);
             }
-            // Now find the start of that entry
-            if (target >= 0) {
-                const prevRange = getLogEntryRange(allLines, target);
-                target = prevRange.start;
+
+            const currentRange = getLogEntryRange(allLines, this._lastLineNum);
+
+            if (delta > 0) {
+                target = currentRange.end + 1;
+                while (target < doc.lineCount && !allLines[target].trim()) {
+                    target++;
+                }
+            } else {
+                target = currentRange.start - 1;
+                while (target >= 0 && !allLines[target].trim()) {
+                    target--;
+                }
+                if (target >= 0) {
+                    const prevRange = getLogEntryRange(allLines, target);
+                    target = prevRange.start;
+                }
             }
         }
 
@@ -161,7 +236,6 @@ class LogDetailViewProvider implements vscode.WebviewViewProvider {
         const pos = new vscode.Position(target, 0);
         editor.selection = new vscode.Selection(pos, pos);
         editor.revealRange(new vscode.Range(pos, pos), vscode.TextEditorRevealType.InCenter);
-        // updateLine will be triggered by onDidChangeTextEditorSelection
     }
 
     private _renderEmpty(): void {

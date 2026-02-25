@@ -312,6 +312,61 @@ export function filterLogContent(content: string, options: LogFilterOptions): st
 }
 
 /**
+ * Builds a mapping from each line index in the filtered output back to the
+ * corresponding line index in the original (raw) content.
+ *
+ * `lineMap[filteredLineIndex] === rawLineIndex`
+ *
+ * When no filter is active the mapping is identity (every index maps to itself).
+ */
+export function buildFilteredLineMap(content: string, options: LogFilterOptions): number[] {
+    const lines = content.split(/\r?\n/);
+
+    if (!isFilterOptionsActive(options)) {
+        return lines.map((_, idx) => idx);
+    }
+
+    const lineMap: number[] = [];
+
+    let i = 0;
+    while (i < lines.length) {
+        const line = lines[i];
+        if (!line.trim()) {
+            i++;
+            continue;
+        }
+
+        const parsed = parseLogLine(line);
+
+        // Collect continuation lines
+        const entryRawStart = i;
+        let j = i + 1;
+        while (j < lines.length && lines[j].trim() !== "" && !isLogEntryStart(lines[j])) {
+            j++;
+        }
+        const entryLength = j - i; // number of raw lines in this entry
+
+        if (!shouldFilterLine(parsed, options)) {
+            if (options.cleanFormat && parsed) {
+                // Filtered output: 1 message line + (entryLength-1) continuation lines
+                lineMap.push(entryRawStart); // message line → raw entry start
+                for (let k = 1; k < entryLength; k++) {
+                    lineMap.push(entryRawStart + k); // continuations map 1-to-1
+                }
+            } else {
+                for (let k = 0; k < entryLength; k++) {
+                    lineMap.push(entryRawStart + k);
+                }
+            }
+        }
+
+        i = j;
+    }
+
+    return lineMap;
+}
+
+/**
  * Collects statistics from raw log content
  */
 export function getLogStats(content: string): LogStats {

@@ -46,7 +46,7 @@ export function activate(context: vscode.ExtensionContext): ExtensionTestHandles
     registerFilterCommands(subs, configSvc);
     createFilterStatusBarItem(subs, { configSvc });
     registerLogDecorations(subs);
-    registerLogDetailPanel(subs);
+    registerLogDetailPanel(logProvider, subs);
     registerBookmarks(subs);
     registerLogNavigation(subs, configSvc);
 

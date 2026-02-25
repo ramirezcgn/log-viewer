@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import {
     LogLevel,
     filterLogContent,
+    buildFilteredLineMap,
     getLogStats,
     type LogFilterOptions,
     type LogStats,
@@ -166,6 +167,7 @@ interface WatchStateInternal {
     offset: number | undefined;
     bytes: Uint8Array | undefined;
     rawBytes: Uint8Array | undefined;
+    lineMap: number[] | undefined;
     createdOn: Date;
     lastChangedOn: Date;
 }
@@ -176,6 +178,7 @@ export interface WatchState {
     readonly lastFileName: string | undefined;
     readonly bytes: Uint8Array | undefined;
     readonly rawBytes: Uint8Array | undefined;
+    readonly lineMap: number[] | undefined;
     readonly createdOn: Date;
     readonly lastChangedOn: Date;
 }
@@ -185,6 +188,7 @@ function createWatchState(uri: vscode.Uri, w: WatchStateInternal): WatchState {
         running: !!w.watcher,
         bytes: w.bytes,
         rawBytes: w.rawBytes,
+        lineMap: w.lineMap,
         createdOn: w.createdOn,
         lastChangedOn: w.lastChangedOn,
         lastFileName: w.lastFileName,
@@ -286,6 +290,7 @@ export class LogWatchProvider implements vscode.Disposable {
             offset: undefined,
             bytes: undefined,
             rawBytes: undefined,
+            lineMap: undefined,
         } satisfies WatchStateInternal;
         newState.watcher.onChange(e => {
             void this.checkChange(uri, newState, e.filename);
@@ -314,6 +319,18 @@ export class LogWatchProvider implements vscode.Disposable {
         // Apply filters to the content
         const newBytes = newRawBytes ? applyFilters(newRawBytes, this.configSvc) : undefined;
 
+        // Build line map (filtered line index → raw line index)
+        const newLineMap: number[] | undefined = newRawBytes
+            ? (() => {
+                const filterOptions = convertFilterOptions(this.configSvc);
+                if (!filterOptions.cleanFormat) {
+                    return undefined; // identity — no need to store
+                }
+                const rawText = new TextDecoder("utf-8").decode(newRawBytes);
+                return buildFilteredLineMap(rawText, filterOptions);
+            })()
+            : undefined;
+
         // check if filename changed
         let changeType: EventType.ContentChange | EventType.FileChange | null = null;
         if (state.lastFileName !== filename) {
@@ -326,6 +343,7 @@ export class LogWatchProvider implements vscode.Disposable {
         if (!uint8ArrayEquals(state.bytes, newBytes)) {
             state.rawBytes = newRawBytes;
             state.bytes = newBytes;
+            state.lineMap = newLineMap;
             changeType ??= EventType.ContentChange;
         }
 
